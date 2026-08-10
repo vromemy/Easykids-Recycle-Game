@@ -13,6 +13,7 @@ uint8_t rxCnt = 0, rxBuf[8];
 
 float Power_FL, Power_FR, Power_BL, Power_BR;
 float yawOffset = 0;
+float PID_yawOffset = 0;
 
 float main_speed = 100;
 
@@ -57,7 +58,7 @@ double getYaw()
 
 double PID_yaw() 
 {
-  float yaw = getYaw() - yawOffset;
+  float yaw = getYaw() - PID_yawOffset;
 
   return yaw;
 }
@@ -150,11 +151,11 @@ void loop() {
 
   if (gamepadTriangle[0] == 1) 
   {
-    yawOffset = getYaw();
+    PID_yawOffset = getYaw();
     delay(2000);
     servo(6, 0);
     isDown = true;
-    PID_gyro_time(100, 4, 0, 1, 1350);
+    PID_gyro_time(100, 5   , 0, 1, 1250);
     Brake();
 
     delay (200);
@@ -345,10 +346,20 @@ void Lift_arm() {
     if (!ArmOccupied) {
 
       if (isDown) {
+        servo(5, 100);
+        isGrab = true;
+
+        delay(100);
+
         servo(6, 95);
-        isDown = false;
+        isDown = false;  
       }
       else {
+        servo(5, 60);
+        isGrab = false;
+
+        delay(100);
+        
         servo(6, 0);
         isDown = true;
       }
