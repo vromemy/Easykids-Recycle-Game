@@ -6,13 +6,14 @@
 
 #define Left_sensor 33
 #define Right_sensor 27
+#define Start_button 0
 
 float pvYaw = 0;
 uint8_t rxCnt = 0, rxBuf[8];
 
 
 float Power_FL, Power_FR, Power_BL, Power_BR;
-float yawOffset = 0;
+float yawOffset = 0;  
 float PID_yawOffset = 0;
 
 float main_speed = 100;
@@ -84,6 +85,7 @@ void setup() {
 
   pinMode(Right_sensor, INPUT);
   pinMode(Left_sensor, INPUT);
+  pinMode(Start_button, INPUT);
 
   servo(5, 0); // greater the value tighter the gripper
   servo(6, 95);
@@ -100,6 +102,8 @@ void setup() {
 
   welcomeSong();
 
+  ledSetBrightness(100);
+
 }
 
 
@@ -107,7 +111,6 @@ void setup() {
 
 
 void loop() {
-
   Ayanami_Gamepad();
 
 
@@ -155,7 +158,7 @@ void loop() {
     delay(2000);
     servo(6, 0);
     isDown = true;
-    PID_gyro_time(100, 5   , 0, 1, 1250);
+    PID_gyro_time(100, 4   , 0, 1, 1250);
     Brake();
 
     delay (200);
@@ -182,6 +185,8 @@ void loop() {
   Lift_arm();
 
   speed_set_aim();
+
+  colours();
 
   // Serial.println(analogRead(Left_sensor));
   // Serial.println(analogRead(Right_sensor));
@@ -360,7 +365,7 @@ void Lift_arm() {
 
         delay(100);
         
-        servo(6, 0);
+        servo(6, 6);
         isDown = true;
       }
 
@@ -383,6 +388,39 @@ void Brake() {
   motor(2,0);
   motor(3,0);
   motor(4,0);
+}
+
+
+
+bool colourOccupied = false;
+bool isBlue = false;
+
+void colours() {
+
+  if (digitalRead(0) == 1) { 
+
+    if (!colourOccupied) {
+
+      if (isBlue) {
+        ledFillColor(RED);
+        isBlue = false;
+      }
+      else {
+        ledFillColor(BLUE);
+        isBlue = true;
+      }
+      
+      colourOccupied = true;
+
+    }
+    
+  } 
+  else {
+
+    colourOccupied = false;
+
+  }
+
 }
 
 
